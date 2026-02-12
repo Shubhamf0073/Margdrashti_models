@@ -143,17 +143,38 @@ class DatasetDownloader:
         downloaded = []
 
         # List of Kaggle datasets
-        kaggle_datasets = [
+        # List of recommended Roboflow datasets
+        datasets = [
             {
-                'dataset': 'chitholian/annotated-potholes-dataset',
-                'name': 'annotated-potholes',
-                'has_labels': True
+                'workspace': 'gerapothole',
+                'project': 'pothole-detection-yolov8',
+                'version': 1,
+                'name': 'GeraPotHole'
             },
             {
-                'dataset': 'sachinpatel21/pothole-image-dataset',
-                'name': 'pothole-images',
-                'has_labels': True
+                'workspace': 'kartik-zvust',
+                'project': 'pothole-detection-yolo-v8',
+                'version': 1,
+                'name': 'Kartik'
             },
+            {
+                'workspace': 'roboflow-universe-projects',
+                'project': 'pothole-segmentation',
+                'version': 2,
+                'name': 'PotholeSegmentation'
+            },
+            {
+                'workspace': 'augmented-startups',
+                'project': 'pothole-detection-system',
+                'version': 1,
+                'name': 'AugmentedStartups'
+            },
+            {
+                'workspace': 'stanford-cars',
+                'project': 'road-damage-detection',
+                'version': 1,
+                'name': 'RoadDamage'
+            }
         ]
 
         for ds_info in kaggle_datasets:
