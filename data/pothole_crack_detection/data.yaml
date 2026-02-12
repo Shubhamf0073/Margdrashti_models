@@ -1,0 +1,10 @@
+names:
+- pothole
+- crack
+- longitudinal_crack
+- transverse_crack
+nc: 4
+path: /Users/shubhamfufal/kaushal/data/pothole_crack_detection
+test: images/test
+train: images/train
+val: images/val

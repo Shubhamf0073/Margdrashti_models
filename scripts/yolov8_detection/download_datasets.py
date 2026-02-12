@@ -30,11 +30,10 @@ except ImportError:
     print("WARNING: roboflow not installed. Install with: pip install roboflow")
     Roboflow = None
 
-try:
-    from kaggle.api.kaggle_api_extended import KaggleApi
-except ImportError:
-    print("WARNING: kaggle not installed. Install with: pip install kaggle")
-    KaggleApi = None
+# NOTE: Kaggle import is deferred to download_kaggle_datasets() because
+# the kaggle library triggers authentication at import time, which crashes
+# if ~/.kaggle/kaggle.json is missing.
+KaggleApi = None
 
 
 class DatasetDownloader:
@@ -122,6 +121,14 @@ class DatasetDownloader:
 
     def download_kaggle_datasets(self):
         """Download datasets from Kaggle."""
+        global KaggleApi
+        try:
+            from kaggle.api.kaggle_api_extended import KaggleApi
+        except (ImportError, OSError) as e:
+            print(f"Skipping Kaggle downloads (kaggle not available: {e})")
+            KaggleApi = None
+            return []
+
         if not KaggleApi:
             print("Skipping Kaggle downloads (kaggle library not installed)")
             return []
