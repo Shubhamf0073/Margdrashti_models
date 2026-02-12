@@ -171,7 +171,8 @@ def train_stage1(args):
     print("STAGE 1 COMPLETE")
     print("="*60)
 
-    best_model = Path(args.project) / 'yolov8n_stage1' / 'weights' / 'best.pt'
+    # Use the actual save directory from the trainer (Ultralytics may prepend runs/detect/)
+    best_model = Path(model.trainer.save_dir) / 'weights' / 'best.pt'
     print(f"\nBest model saved to: {best_model}")
 
     if hasattr(results, 'results_dict'):
@@ -254,7 +255,8 @@ def train_stage2(args, stage1_model):
     print("STAGE 2 COMPLETE")
     print("="*60)
 
-    best_model = Path(args.project) / 'yolov8n_stage2' / 'weights' / 'best.pt'
+    # Use the actual save directory from the trainer (Ultralytics may prepend runs/detect/)
+    best_model = Path(model.trainer.save_dir) / 'weights' / 'best.pt'
     print(f"\nBest model saved to: {best_model}")
 
     if hasattr(results, 'results_dict'):
