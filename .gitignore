@@ -1,1 +1,17 @@
 *.mp4
+.venv/
+.idea/
+__pycache__/
+*.pyc
+.DS_Store
+
+# Large dataset images/labels (re-downloaded in Colab)
+data/pothole_crack_detection/images/
+data/pothole_crack_detection/labels/
+data/pothole_crack_detection/temp_downloads/
+
+# Training runs (generated, not source)
+scripts/runs/
+
+# Model weights (too large for git)
+*.pt
