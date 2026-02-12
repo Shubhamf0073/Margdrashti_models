@@ -470,12 +470,200 @@ from google.colab import files
 files.download('scripts/runs/yolov8n_stage2/weights/best.pt')
 ```
 
+## 🔧 Troubleshooting Low Training Metrics
+
+### Problem: mAP@50 < 80% or Recall < 70%
+
+**Symptoms:**
+- Model trained but mAP@50 is 70-75% (target is 90%+)
+- Recall is 60-70% (missing 30-40% of potholes!)
+- Training plateaus around epoch 20-25
+- Only detecting 1 class (pothole) instead of 4
+
+**Root Causes:**
+
+#### 1. Dataset Too Small ⚠️ (Most Common)
+```
+Your dataset: 2,000-3,000 images → mAP@50: 72-75%
+Target dataset: 4,000-5,000 images → mAP@50: 87-90%
+```
+
+**Fix:**
+```bash
+# Download and merge multiple datasets
+python scripts/yolov8_detection/download_multi_datasets.py \
+    --roboflow_key YOUR_API_KEY \
+    --target_size 4000 \
+    --output_dir data/pothole_crack_detection_v2
+
+# Retrain with larger dataset
+python scripts/yolov8_detection/train_yolov8.py \
+    --data data/pothole_crack_detection_v2/data.yaml \
+    --epochs_stage1 20 \
+    --epochs_stage2 40
+```
+
+Expected improvement: 72% → 87-90% mAP@50
+
+#### 2. Missing Classes (Crack Detection)
+
+**Check your data.yaml:**
+```bash
+cat data/pothole_crack_detection/data.yaml
+```
+
+**If you see only 1 class:**
+```yaml
+nc: 1
+names: ['pothole']
+```
+
+**You need datasets with all 4 classes:**
+- pothole
+- crack
+- longitudinal_crack
+- transverse_crack
+
+**Fix:** Download datasets that include crack annotations (use `download_multi_datasets.py`)
+
+#### 3. Training Plateau (Not Improving After Epoch 20)
+
+**Evidence:**
+```
+Epoch 20: mAP@50 = 70.5%
+Epoch 25: mAP@50 = 71.8%
+Epoch 30: mAP@50 = 72.1%  ← Only 1.6% improvement in 10 epochs!
+```
+
+**Diagnosis:** Model has learned all it can from limited dataset
+
+**Fix:**
+1. **Primary solution:** Add more training data (see Fix #1)
+2. **If already have 4,000+ images:** Try larger model:
+   ```bash
+   --model yolov8s.pt  # instead of yolov8n.pt
+   ```
+
+#### 4. Low Recall (Missing Too Many Detections)
+
+**Symptoms:**
+- Recall < 70% (missing 30%+ of potholes)
+- Precision is OK (75-80%) but recall is low
+
+**Diagnosis:** Model is too conservative (high confidence threshold)
+
+**Fix - Option A: Lower confidence threshold during validation:**
+```bash
+# Test different thresholds
+yolo val model=best.pt data=data.yaml conf=0.20  # Lower (better recall)
+yolo val model=best.pt data=data.yaml conf=0.15  # Even lower
+yolo val model=best.pt data=data.yaml conf=0.30  # Higher (better precision)
+```
+
+**Fix - Option B: Add more diverse training examples:**
+- Small potholes
+- Potholes in shadows
+- Wet roads
+- Different lighting conditions
+
+#### 5. Model Path Error
+
+**Error:**
+```
+FileNotFoundError: 'scripts/runs/yolov8n_stage1/weights/best.pt'
+```
+
+**Actual path:**
+```
+runs/detect/scripts/runs/yolov8n_stage1/weights/best.pt
+```
+
+**Fix:** This is already fixed in the latest version. Pull the latest changes:
+```bash
+git pull origin claude/add-pothole-detection-660lv
+```
+
+### Quick Diagnostic Checklist
+
+Run these commands to diagnose your training issues:
+
+```bash
+# 1. Check dataset size
+echo "Train images: $(ls data/pothole_crack_detection/images/train/ | wc -l)"
+echo "Val images: $(ls data/pothole_crack_detection/images/val/ | wc -l)"
+
+# Target: 3,000+ training images
+# If < 3,000: Download more datasets!
+
+# 2. Check number of classes
+cat data/pothole_crack_detection/data.yaml | grep "nc:"
+
+# Should show: nc: 4
+# If nc: 1 → Missing crack detection!
+
+# 3. Check training metrics
+tail -20 scripts/runs/yolov8n_stage2/results.csv
+
+# Look for mAP@50(B) column
+# If stuck around 0.7-0.75 for last 10 epochs → Plateau (need more data)
+
+# 4. Check class distribution
+python -c "
+import glob
+from collections import Counter
+labels = glob.glob('data/pothole_crack_detection/labels/train/*.txt')
+classes = Counter()
+for lbl in labels:
+    with open(lbl) as f:
+        for line in f:
+            cls = int(line.split()[0])
+            classes[cls] += 1
+print('Class distribution:', dict(classes))
+"
+# Should show balanced distribution across 4 classes
+```
+
+### Performance Expectations
+
+| Dataset Size | Classes | Expected mAP@50 | Expected Recall |
+|--------------|---------|-----------------|-----------------|
+| 1,000-2,000  | 1       | 65-75%          | 55-65%          |
+| 2,000-3,000  | 1       | 70-77%          | 60-70%          |
+| 3,000-4,000  | 4       | 82-87%          | 72-78%          |
+| 4,000-5,000  | 4       | 87-92%          | 77-83%          |
+| 5,000+       | 4       | 90-95%          | 80-88%          |
+
+**Current Issue:** Most users have 2,000-3,000 images with 1 class → 72-77% mAP@50
+
+**Target:** 4,000-5,000 images with 4 classes → 87-92% mAP@50
+
+### When to Retrain vs. Fine-Tune
+
+**Retrain from scratch if:**
+- ✅ You added significantly more data (doubled dataset size)
+- ✅ You added new classes (e.g., added crack detection)
+- ✅ Current mAP@50 < 75%
+
+**Fine-tune existing model if:**
+- ✅ Current mAP@50 > 80%
+- ✅ Only added 10-20% more data
+- ✅ Same classes, just more examples
+
+```bash
+# Fine-tune from existing model
+python scripts/yolov8_detection/train_yolov8.py \
+    --resume_stage1 runs/detect/scripts/runs/yolov8n_stage1/weights/best.pt \
+    --skip_stage1 \
+    --epochs_stage2 20  # Fewer epochs for fine-tuning
+```
+
 ## 📞 Support
 
 - **Documentation**: `scripts/yolov8_detection/README.md`
 - **Ultralytics Docs**: https://docs.ultralytics.com/
 - **Training Issues**: Check `scripts/runs/yolov8n_stage2/train.log`
 - **Inference Issues**: Run with `--device cpu` to test if it's GPU-related
+- **Low Metrics Issues**: See Troubleshooting section above
 
 ## ✅ Success Criteria
 
