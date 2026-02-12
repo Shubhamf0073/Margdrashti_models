@@ -1,0 +1,167 @@
+# Dataset Configuration for Margdrashti Pothole Detection
+# This file lists all dataset sources for multi-dataset download
+# Target: 4,000+ images for 87-90% mAP@50
+
+# ============================================================
+# ROBOFLOW DATASETS (Requires API key from https://app.roboflow.com/settings/api)
+# ============================================================
+roboflow_datasets:
+  # Dataset 1: GeraPotHole - High quality pothole annotations
+  - workspace: "gerapothole"
+    project: "pothole-detection-yolov8"
+    version: 1
+    name: "GeraPotHole"
+    expected_images: 2866
+    classes: ["pothole"]
+    notes: "Indian road conditions, good quality"
+
+  # Dataset 2: Kartik - Diverse pothole dataset
+  - workspace: "kartik-zvust"
+    project: "pothole-detection-yolo-v8"
+    version: 1
+    name: "Kartik"
+    expected_images: 2908
+    classes: ["pothole"]
+    notes: "Mixed lighting conditions"
+
+  # Dataset 3: Roboflow 100 Pothole - Benchmark dataset
+  - workspace: "roboflow-100"
+    project: "pothole-4yqyh"
+    version: 1
+    name: "RF100Pothole"
+    expected_images: 665
+    classes: ["pothole"]
+    notes: "Part of Roboflow 100 benchmark"
+
+  # Dataset 4: Road Damage - Multi-class road defects
+  - workspace: "university-wkhso"
+    project: "road-damage-detection-df8sb"
+    version: 1
+    name: "RoadDamage"
+    expected_images: 1500
+    classes: ["pothole", "crack", "longitudinal_crack", "transverse_crack"]
+    notes: "Multiple damage types, excellent for multi-class"
+
+  # Dataset 5: Crack Detection - Specialized crack dataset
+  - workspace: "crack-detection"
+    project: "crack-detection-iw8wt"
+    version: 2
+    name: "CrackDetection"
+    expected_images: 1200
+    classes: ["crack", "longitudinal_crack", "transverse_crack"]
+    notes: "Focus on crack types"
+
+# ============================================================
+# KAGGLE DATASETS (Requires kaggle.json in ~/.kaggle/)
+# ============================================================
+kaggle_datasets:
+  # Dataset 1: Annotated Potholes - Large dataset with XML annotations
+  - dataset: "chitholian/annotated-potholes-dataset"
+    name: "annotated-potholes"
+    expected_images: 665
+    format: "pascal_voc"  # XML format, needs conversion
+    classes: ["pothole"]
+    notes: "High quality annotations, needs VOC to YOLO conversion"
+
+  # Dataset 2: Pothole Image Dataset
+  - dataset: "sachinpatel21/pothole-image-dataset"
+    name: "pothole-images"
+    expected_images: 800
+    format: "yolo"
+    classes: ["pothole"]
+    notes: "Ready-to-use YOLO format"
+
+  # Dataset 3: Road Damage Detection (RDD2020)
+  - dataset: "virenbajaj/road-crack-detection"
+    name: "road-crack-detection"
+    expected_images: 2000
+    format: "yolo"
+    classes: ["crack", "longitudinal_crack", "transverse_crack"]
+    notes: "Based on RDD2020 competition dataset"
+
+# ============================================================
+# DIRECT DOWNLOAD DATASETS (No API key needed)
+# ============================================================
+direct_datasets:
+  # Dataset 1: Pothole Dataset v8 from GitHub
+  - url: "https://github.com/sukhad-app/pothole-detection-dataset/releases/download/v1.0/pothole_dataset_v8.zip"
+    name: "PotholeV8"
+    expected_images: 800
+    format: "yolo"
+    classes: ["pothole"]
+    notes: "GitHub public dataset"
+
+  # Dataset 2: CFD (Crack Forest Dataset) - Academic dataset
+  - url: "https://github.com/cuilimeng/CrackForest-dataset/archive/refs/heads/master.zip"
+    name: "CrackForest"
+    expected_images: 118
+    format: "images_only"
+    classes: ["crack"]
+    notes: "Needs annotation, or use for augmentation"
+
+# ============================================================
+# DATASET STATISTICS
+# ============================================================
+expected_totals:
+  roboflow: 9139  # If all downloaded
+  kaggle: 3465    # If all downloaded
+  direct: 918     # If all downloaded
+  grand_total: 13522  # Maximum possible
+
+  recommended_minimum: 4000  # For 85-90% mAP@50
+  current_script: 2875       # With only 2 datasets
+
+# ============================================================
+# CLASS MAPPING (Normalize different dataset class names)
+# ============================================================
+class_mapping:
+  # Pothole variations
+  pothole: 0
+  Pothole: 0
+  POTHOLE: 0
+  pot-hole: 0
+  pot_hole: 0
+
+  # General crack variations
+  crack: 1
+  Crack: 1
+  CRACK: 1
+  general_crack: 1
+  alligator_crack: 1  # Map alligator to general crack
+
+  # Longitudinal crack variations
+  longitudinal_crack: 2
+  longitudinal-crack: 2
+  Longitudinal_Crack: 2
+  D00: 2  # RDD2020 code for longitudinal crack
+
+  # Transverse crack variations
+  transverse_crack: 3
+  transverse-crack: 3
+  Transverse_Crack: 3
+  lateral_crack: 3
+  D10: 3  # RDD2020 code for transverse crack
+  D20: 3  # Also transverse
+
+# ============================================================
+# DOWNLOAD PRIORITIES (Set which datasets to download)
+# ============================================================
+download_priority:
+  # Priority 1: Essential (must download)
+  essential:
+    - GeraPotHole
+    - Kartik
+    - RoadDamage
+    - road-crack-detection
+
+  # Priority 2: Recommended (for 4,000+ images)
+  recommended:
+    - RF100Pothole
+    - CrackDetection
+    - pothole-images
+
+  # Priority 3: Optional (for maximum dataset)
+  optional:
+    - annotated-potholes
+    - PotholeV8
+    - CrackForest
