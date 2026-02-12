@@ -1,0 +1,11 @@
+{
+  "roi_points": [
+    [300, 650],
+    [1620, 650],
+    [1450, 380],
+    [470, 380]
+  ],
+  "description": "ROI configuration for pothole and crack detection - covers main road area",
+  "video_resolution": "1920x1080",
+  "notes": "Adjust coordinates based on your actual video resolution. Use draw_pothole_roi.py to create custom ROI."
+}
