@@ -1,22 +1,3 @@
-"""
-make_roi_auto.py
-Auto-generate trapezoid ROI for road audit (highway vs sector).
-
-Output format:
-{
-  "roi_points": [[x_bl,y_bl],[x_br,y_br],[x_tr,y_tr],[x_tl,y_tl]],
-  "mode": "highway"|"sector",
-  "frame_wh": [W,H],
-  "fractions": {...}
-}
-
-Usage:
-  python3 make_roi_auto.py /path/to/video.mp4 --mode highway --out roi_highway.json
-  python3 make_roi_auto.py /path/to/video.mp4 --mode sector  --out roi_sector.json
-
-Deps:
-  pip install opencv-python
-"""
 import argparse, json
 from pathlib import Path
 import cv2
