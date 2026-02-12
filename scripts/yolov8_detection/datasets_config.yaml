@@ -6,7 +6,7 @@
 # ROBOFLOW DATASETS (Requires API key from https://app.roboflow.com/settings/api)
 # ============================================================
 roboflow_datasets:
-  # Dataset 1: GeraPotHole - High quality pothole annotations
+  # Dataset 1: GeraPotHole - High quality pothole annotations (WORKING)
   - workspace: "gerapothole"
     project: "pothole-detection-yolov8"
     version: 1
@@ -15,7 +15,7 @@ roboflow_datasets:
     classes: ["pothole"]
     notes: "Indian road conditions, good quality"
 
-  # Dataset 2: Kartik - Diverse pothole dataset
+  # Dataset 2: Kartik - Diverse pothole dataset (WORKING)
   - workspace: "kartik-zvust"
     project: "pothole-detection-yolo-v8"
     version: 1
@@ -24,32 +24,32 @@ roboflow_datasets:
     classes: ["pothole"]
     notes: "Mixed lighting conditions"
 
-  # Dataset 3: Roboflow 100 Pothole - Benchmark dataset
-  - workspace: "roboflow-100"
-    project: "pothole-4yqyh"
-    version: 1
-    name: "RF100Pothole"
+  # Dataset 3: Pothole Segmentation - Public dataset
+  - workspace: "joseph-nelson"
+    project: "pothole-segmentation"
+    version: 2
+    name: "PotholeSegmentation"
     expected_images: 665
     classes: ["pothole"]
-    notes: "Part of Roboflow 100 benchmark"
+    notes: "Public Roboflow Universe dataset"
 
-  # Dataset 4: Road Damage - Multi-class road defects
-  - workspace: "university-wkhso"
-    project: "road-damage-detection-df8sb"
+  # Dataset 4: Road Surface Defects - Multi-class
+  - workspace: "roadsurfacedetection"
+    project: "pothole-and-road-damage"
     version: 1
-    name: "RoadDamage"
-    expected_images: 1500
-    classes: ["pothole", "crack", "longitudinal_crack", "transverse_crack"]
-    notes: "Multiple damage types, excellent for multi-class"
+    name: "RoadSurfaceDefects"
+    expected_images: 800
+    classes: ["pothole", "crack"]
+    notes: "Road damage detection"
 
-  # Dataset 5: Crack Detection - Specialized crack dataset
-  - workspace: "crack-detection"
-    project: "crack-detection-iw8wt"
-    version: 2
-    name: "CrackDetection"
-    expected_images: 1200
-    classes: ["crack", "longitudinal_crack", "transverse_crack"]
-    notes: "Focus on crack types"
+  # Dataset 5: Annotated Potholes Dataset
+  - workspace: "myworkspace-potholes"
+    project: "annotated-potholes"
+    version: 1
+    name: "AnnotatedPotholes"
+    expected_images: 500
+    classes: ["pothole"]
+    notes: "Well-annotated pothole dataset"
 
 # ============================================================
 # KAGGLE DATASETS (Requires kaggle.json in ~/.kaggle/)
