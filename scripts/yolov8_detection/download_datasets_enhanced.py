@@ -323,6 +323,10 @@ class EnhancedDatasetDownloader:
                     with open(label_file, 'w') as f:
                         f.write('\n'.join(yolo_annotations))
 
+            except Exception as e:
+                print(f"⚠️  Failed to convert {xml_file.name}: {e}")
+                continue
+
         print(f"✓ Converted {len(xml_files)} annotations to YOLO format")
         return yolo_path
 
